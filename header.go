@@ -3,27 +3,25 @@ package main
 import "github.com/Nyarum/barrel"
 
 type Header struct {
+	Message
+
 	Type       uint8
 	Size       uint16
 	NextPkgLen uint8
-	NextPkgs   string
+	NextPkg    string
 }
 
-func (p *Header) Default() {
+func (h *Header) Unpack(data []byte) (int, error) {
 
-}
-func (p Header) Check(stats *barrel.Stats) bool {
-	return true
-}
-
-func (h *Header) Unpack(data []byte) error {
 	barrel := barrel.NewBarrel()
 	load := barrel.Load(h, data, false)
 
 	err := barrel.Unpack(load)
 	if err != nil {
-		return err
+		return 0, err
 	}
 
-	return nil
+	h.NextPkg = string(data[4 : 4+h.NextPkgLen])
+
+	return 3 + int(h.NextPkgLen), nil
 }

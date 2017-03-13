@@ -4,13 +4,15 @@ import (
 	"database/sql"
 	"flag"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"net"
 	"os"
 
 	_ "github.com/mattn/go-sqlite3"
 )
+
+const MPM_MAJOR_VERSION uint8 = 0
+const MPM_MINOR_VERSION uint8 = 1
 
 func main() {
 
@@ -50,11 +52,25 @@ func main() {
 }
 
 func handleRequest(conn net.Conn, db *sql.DB) {
+	buf := make([]byte, 4096)
 
-	message, err := ioutil.ReadAll(conn)
-	if err != nil {
-		log.Print("Error reading:", err.Error())
+	//var auth bool = false
+
+	for {
+		n, err := conn.Read(buf)
+		fmt.Println("receive :", buf[0:n])
+
+		ParseRequest(buf[0:n], conn, db)
+
+		if err != nil || n == 0 {
+			conn.Close()
+			break
+		}
+
+		if err != nil {
+			conn.Close()
+			break
+		}
 	}
-	ParseRequest(message, conn)
-	conn.Close()
+
 }

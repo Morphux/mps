@@ -2,7 +2,6 @@ package main
 
 import (
 	"database/sql"
-	"fmt"
 	"log"
 
 	_ "github.com/mattn/go-sqlite3"
@@ -10,47 +9,64 @@ import (
 
 // MPM package
 type Package struct {
-	id             uint64
-	name           string
-	version        string
-	category       string
-	description    string
-	archive        string
-	sbu            uint64
-	dependencies   string
-	archive_size   uint64
-	installed_size uint64
-	archive_hash   string
+	ID            uint64
+	Name          string
+	Version       string
+	Category      string
+	Description   string
+	Archive       string
+	SBU           uint64
+	Dependencies  string
+	ArchiveSize   uint64
+	InstalledSize uint64
+	ArchiveHash   string
 }
 
-func queryPackageByName(name string, state int, db *sql.DB) {
+func QueryPkgNameAndCat(name string, category string, state uint8, db *sql.DB) (Package, error) {
 	pkg := Package{}
-	rows, err := db.Query("SELECT * FROM pkgs where name = ?", name)
+
+	var err error
+
+	var rows *sql.Rows
+
+	if name != "" && category != "" {
+		rows, err = db.Query("SELECT * FROM pkgs where name = ? AND category = ?", name, category)
+	} else if name != "" {
+		rows, err = db.Query("SELECT * FROM pkgs where name = ?", name)
+	} else {
+		rows, err = db.Query("SELECT * FROM pkgs where category = ?", category)
+	}
+
 	if err != nil {
 		log.Fatalln(err)
 	}
 	for rows.Next() {
-		err := rows.Scan(&pkg.id, &pkg.name, &pkg.version, &pkg.category, &pkg.description,
-			&pkg.archive, &pkg.sbu, &pkg.dependencies, &pkg.archive_size, &pkg.installed_size, &pkg.archive_hash)
+		err := rows.Scan(&pkg.ID, &pkg.Name, &pkg.Version, &pkg.Category, &pkg.Description,
+			&pkg.Archive, &pkg.SBU, &pkg.Dependencies, &pkg.ArchiveSize, &pkg.InstalledSize, &pkg.ArchiveHash)
 		if err != nil {
+			return pkg, err
 			log.Fatalln(err)
 		}
-		fmt.Printf("%#v\n", pkg)
+		return pkg, nil
 	}
+
+	return pkg, nil
 }
 
-func queryPackageByid(id uint64, state int, db *sql.DB) {
+func QueryPkgID(id uint64, state uint8, db *sql.DB) (Package, error) {
 	pkg := Package{}
 	rows, err := db.Query("SELECT * FROM pkgs where id = ?", id)
 	if err != nil {
 		log.Fatalln(err)
 	}
 	for rows.Next() {
-		err := rows.Scan(&pkg.id, &pkg.name, &pkg.version, &pkg.category, &pkg.description,
-			&pkg.archive, &pkg.sbu, &pkg.dependencies, &pkg.archive_size, &pkg.installed_size, &pkg.archive_hash)
+		err := rows.Scan(&pkg.ID, &pkg.Name, &pkg.Version, &pkg.Category, &pkg.Description,
+			&pkg.Archive, &pkg.SBU, &pkg.Dependencies, &pkg.ArchiveSize, &pkg.InstalledSize, &pkg.ArchiveHash)
 		if err != nil {
+			return pkg, err
 			log.Fatalln(err)
 		}
-		fmt.Printf("%#v\n", pkg)
+		return pkg, nil
 	}
+	return pkg, nil
 }
