@@ -10,7 +10,6 @@ import (
 
 	"github.com/Morphux/mps/request"
 	"github.com/Morphux/mps/response"
-
 	_ "github.com/mattn/go-sqlite3"
 )
 

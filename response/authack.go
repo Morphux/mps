@@ -10,9 +10,9 @@ type AuthACK struct {
 }
 
 func Version() []byte {
-	return []byte{0, 1}
+	return []byte{1, 0}
 }
 
 func GetAuthACK() []byte {
-	return append([]byte{0x2, 0x2, 0x0}, Version()...)
+	return append([]byte{0x02, 0x07, 0x00, 0x00, 0x01}, Version()...)
 }
