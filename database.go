@@ -2,8 +2,14 @@ package main
 
 import (
 	"database/sql"
+	"errors"
+	"fmt"
 	"log"
+	"strconv"
+	"strings"
 
+	"github.com/Morphux/mps/request"
+	"github.com/Morphux/mps/response"
 	_ "github.com/mattn/go-sqlite3"
 )
 
@@ -15,11 +21,71 @@ type Package struct {
 	Category      string
 	Description   string
 	Archive       string
-	SBU           uint64
+	SBU           float64
 	Dependencies  string
-	ArchiveSize   uint64
-	InstalledSize uint64
+	ArchiveSize   float64
+	InstalledSize float64
 	ArchiveHash   string
+}
+
+func RequestPackage(data []byte, db *sql.DB) (int, Package, error) {
+	pkg := Package{}
+
+	req := new(request.ReqGetPKG)
+
+	n, err := req.Unpack(data)
+
+	if err != nil {
+		return n, pkg, err
+	}
+
+	fmt.Println(req)
+
+	if req.ID != 0 && req.NameLen == 0 && req.CategLen == 0 {
+		fmt.Println("search By id")
+		pkg, err = QueryPkgID(req.ID, req.State, db)
+	} else if req.ID == 0 && req.NameLen != 0 && req.CategLen != 0 {
+		fmt.Println("search By category")
+		pkg, err = QueryPkgNameAndCat(req.Name, req.Category, req.State, db)
+	} else {
+		err = errors.New("A packet send by the client is wrong")
+	}
+
+	return n, pkg, err
+}
+
+func PkgtoRespPkg(pkg Package) (error, *response.RespPkg) {
+
+	dep := strings.Split(pkg.Dependencies, ",")
+
+	var depID []uint64
+	for _, v := range dep {
+		i, err := strconv.Atoi(v)
+		if err != nil {
+			continue
+		}
+		depID = append(depID, uint64(i))
+	}
+
+	ret := new(response.RespPkg)
+	ret.ID = pkg.ID
+	ret.CompTime = pkg.SBU
+	ret.InstSize = pkg.InstalledSize
+	ret.ArchSize = pkg.ArchiveSize
+	ret.NameLen = uint64(len(pkg.Name))
+	ret.CategoryLen = uint16(len(pkg.Category))
+	ret.VersionLen = uint16(len(pkg.Version))
+	ret.ArchiveLen = uint16(len(pkg.Archive))
+	ret.ChecksumLen = uint16(len(pkg.ArchiveHash))
+	ret.DependenciesSize = uint16(len(depID))
+	ret.Name = pkg.Name
+	ret.Category = pkg.Category
+	ret.Version = pkg.Version
+	ret.Archive = pkg.Archive
+	ret.Checksum = pkg.ArchiveHash
+	ret.Dependencies = depID
+
+	return nil, ret
 }
 
 func QueryPkgNameAndCat(name string, category string, state uint8, db *sql.DB) (Package, error) {

@@ -5,19 +5,25 @@ import (
 	"errors"
 	"fmt"
 	"net"
+
+	"github.com/Morphux/mps/message"
 )
 
-func ParseRequest(message []byte, conn net.Conn, db *sql.DB) error {
-	var cursor int
-	var header = new(Header)
+func Version() []byte {
+	return []byte{0, 1}
+}
 
-	if len(message) < 5 {
+func ParseRequest(data []byte, conn net.Conn, db *sql.DB) error {
+	var cursor int
+	var header = new(message.Header)
+
+	if len(data) < 5 {
 		return errors.New("Header too short")
 	}
 
-	headerSize := uint8(message[3])
+	headerSize := uint8(data[3])
 
-	c, err := header.Unpack(message[0 : 3+headerSize+2])
+	c, err := header.Unpack(data[0 : 3+headerSize+2])
 	cursor += c
 
 	if header == nil || err != nil {
@@ -32,7 +38,7 @@ func ParseRequest(message []byte, conn net.Conn, db *sql.DB) error {
 	case 0x01:
 		conn.Write(Version())
 	case 0x10:
-		c, _, _ := RequestPackage(message[cursor+1:], db)
+		c, _, _ := RequestPackage(data[cursor+1:], db)
 		cursor += c
 	default:
 		fmt.Println(header.Type)
