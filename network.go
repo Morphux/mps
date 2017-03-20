@@ -7,11 +7,8 @@ import (
 	"net"
 
 	"github.com/Morphux/mps/message"
+	"github.com/Morphux/mps/response"
 )
-
-func Version() []byte {
-	return []byte{0, 1}
-}
 
 func ParseRequest(data []byte, conn net.Conn, db *sql.DB) error {
 	var cursor int
@@ -36,7 +33,7 @@ func ParseRequest(data []byte, conn net.Conn, db *sql.DB) error {
 
 	switch header.Type {
 	case 0x01:
-		conn.Write(Version())
+		conn.Write(response.GetAuthACK())
 	case 0x10:
 		c, _, _ := RequestPackage(data[cursor+1:], db)
 		cursor += c
