@@ -1,6 +1,9 @@
 package response
 
-import "github.com/Morphux/mps/message"
+import (
+	"github.com/Morphux/mps/message"
+	"github.com/Nyarum/barrel"
+)
 
 type RespPkg struct {
 	message.Message
@@ -9,6 +12,7 @@ type RespPkg struct {
 	CompTime         float64
 	InstSize         float64
 	ArchSize         float64
+	State            uint8
 	NameLen          uint64
 	CategoryLen      uint16
 	VersionLen       uint16
@@ -21,4 +25,13 @@ type RespPkg struct {
 	Archive          string
 	Checksum         string
 	Dependencies     []uint64
+}
+
+func (p *RespPkg) Pack() ([]byte, error) {
+	barrel := barrel.NewBarrel()
+	load := barrel.Load(p, []byte{}, true)
+
+	err := barrel.Pack(load)
+
+	return barrel.Bytes(), err
 }

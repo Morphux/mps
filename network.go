@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"log"
 	"net"
 
 	"github.com/Morphux/mps/message"
@@ -35,7 +36,25 @@ func ParseRequest(data []byte, conn net.Conn, db *sql.DB) error {
 	case 0x01:
 		conn.Write(response.GetAuthACK())
 	case 0x10:
-		c, _, _ := RequestPackage(data[cursor+1:], db)
+		c, pkg, err := RequestPackage(data[cursor+1:], db)
+
+		resp, err := PkgtoRespPkg(pkg)
+
+		resp_data, err := resp.Pack()
+
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		resp_header := new(message.Header)
+
+		resp_header.Build(0x20, 1, resp_data)
+
+		header_data, err := resp_header.Pack()
+
+		conn.Write(append(header_data, resp_data...))
+
+		//conn.Write()
 		cursor += c
 	default:
 		fmt.Println(header.Type)

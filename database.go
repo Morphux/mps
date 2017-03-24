@@ -17,6 +17,7 @@ import (
 type Package struct {
 	ID            uint64
 	Name          string
+	State         uint8
 	Version       string
 	Category      string
 	Description   string
@@ -54,7 +55,7 @@ func RequestPackage(data []byte, db *sql.DB) (int, Package, error) {
 	return n, pkg, err
 }
 
-func PkgtoRespPkg(pkg Package) (error, *response.RespPkg) {
+func PkgtoRespPkg(pkg Package) (*response.RespPkg, error) {
 
 	dep := strings.Split(pkg.Dependencies, ",")
 
@@ -72,6 +73,7 @@ func PkgtoRespPkg(pkg Package) (error, *response.RespPkg) {
 	ret.CompTime = pkg.SBU
 	ret.InstSize = pkg.InstalledSize
 	ret.ArchSize = pkg.ArchiveSize
+	ret.State = pkg.State
 	ret.NameLen = uint64(len(pkg.Name))
 	ret.CategoryLen = uint16(len(pkg.Category))
 	ret.VersionLen = uint16(len(pkg.Version))
@@ -85,7 +87,7 @@ func PkgtoRespPkg(pkg Package) (error, *response.RespPkg) {
 	ret.Checksum = pkg.ArchiveHash
 	ret.Dependencies = depID
 
-	return nil, ret
+	return ret, nil
 }
 
 func QueryPkgNameAndCat(name string, category string, state uint8, db *sql.DB) (Package, error) {
@@ -107,7 +109,7 @@ func QueryPkgNameAndCat(name string, category string, state uint8, db *sql.DB) (
 		log.Fatalln(err)
 	}
 	for rows.Next() {
-		err := rows.Scan(&pkg.ID, &pkg.Name, &pkg.Version, &pkg.Category, &pkg.Description,
+		err := rows.Scan(&pkg.ID, &pkg.Name, &pkg.State, &pkg.Version, &pkg.Category, &pkg.Description,
 			&pkg.Archive, &pkg.SBU, &pkg.Dependencies, &pkg.ArchiveSize, &pkg.InstalledSize, &pkg.ArchiveHash)
 		if err != nil {
 			return pkg, err
@@ -126,7 +128,7 @@ func QueryPkgID(id uint64, state uint8, db *sql.DB) (Package, error) {
 		log.Fatalln(err)
 	}
 	for rows.Next() {
-		err := rows.Scan(&pkg.ID, &pkg.Name, &pkg.Version, &pkg.Category, &pkg.Description,
+		err := rows.Scan(&pkg.ID, &pkg.Name, &pkg.State, &pkg.Version, &pkg.Category, &pkg.Description,
 			&pkg.Archive, &pkg.SBU, &pkg.Dependencies, &pkg.ArchiveSize, &pkg.InstalledSize, &pkg.ArchiveHash)
 		if err != nil {
 			return pkg, err

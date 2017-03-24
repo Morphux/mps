@@ -25,3 +25,23 @@ func (h *Header) Unpack(data []byte) (int, error) {
 
 	return 3 + int(h.NextPkgLen), nil
 }
+
+func (h *Header) Build(Type, number uint8, data []byte) {
+	h.Type = Type
+	h.NextPkgLen = 0
+	h.NextPkg = ""
+
+	h.Size = uint16(int(1+2+1+h.NextPkgLen+number) + len(data))
+
+}
+
+//BuildWithHeader Is theorically faster than generating header and Packing it
+// func BuildWithHeader(Type, number uint8, data []byte) []byte {
+
+// 	hash := ""
+
+// 	header := []byte{Type, , len(hash), hash}
+
+// 	return append()
+
+// }
