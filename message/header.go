@@ -35,13 +35,22 @@ func (h *Header) Build(Type, number uint8, data []byte) {
 
 }
 
-//BuildWithHeader Is theorically faster than generating header and Packing it
-// func BuildWithHeader(Type, number uint8, data []byte) []byte {
+func (p *Header) Pack() ([]byte, error) {
+	barrel := barrel.NewBarrel()
+	load := barrel.Load(p, []byte{}, true)
 
-// 	hash := ""
+	err := barrel.Pack(load)
 
-// 	header := []byte{Type, , len(hash), hash}
+	return barrel.Bytes(), err
+}
 
-// 	return append()
+//BuildHeader Is theorically faster than generating header and Packing it
+func BuildHeader(Type, number uint8, data []byte) []byte {
 
-// }
+	hash := ""
+
+	header := []byte{Type, byte(len(data) & 0xff), byte(len(data) >> 8), byte(len(hash))}
+
+	return header
+
+}

@@ -62,13 +62,12 @@ func ParseRequest(data []byte, conn net.Conn, db *sql.DB) error {
 
 		header_data, err := resp_header.Pack()
 
-		tosend := append(header_data, resp_data...)
+		fmt.Println("header", header_data, resp_header, message.BuildHeader(0x20, 1, resp_data))
 
-		fmt.Printf("PKG DATA TO BE SENT : %#v\n", tosend)
+		tosend := append(message.BuildHeader(0x20, 1, resp_data), 0x1)
+		tosend = append(tosend, resp_data...)
 
-		i, err := conn.Write(tosend)
-
-		fmt.Println(i)
+		_, err = conn.Write(tosend)
 
 		if err != nil {
 			return err
