@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"github.com/Morphux/mps/message"
-	"github.com/Nyarum/barrel"
+	"github.com/Morphux/mps/vendors/Nyarum/barrel"
 )
 
 type ReqGetPKG struct {
@@ -23,6 +23,8 @@ type ReqGetPKG struct {
 
 func (h *ReqGetPKG) Unpack(data []byte) (int, error) {
 
+	fmt.Printf("=====\ndata %#v\n\n", data)
+
 	var l uint16 = 15
 
 	fmt.Println(data)
@@ -35,7 +37,7 @@ func (h *ReqGetPKG) Unpack(data []byte) (int, error) {
 		return 0, err
 	}
 
-	fmt.Println(h.ID, h.NameLen, h.CategLen, h.VersionLen)
+	//fmt.Println(h.ID, h.NameLen, h.CategLen, h.VersionLen)
 
 	if len(data) < int(l+h.NameLen+h.CategLen+h.VersionLen) {
 		return 0, errors.New("A packet send by the client is wrong")

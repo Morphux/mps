@@ -1,6 +1,6 @@
 package message
 
-import "github.com/Nyarum/barrel"
+import "github.com/Morphux/mps/vendors/Nyarum/barrel"
 
 type Payload struct {
 	Number uint8

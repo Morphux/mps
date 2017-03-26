@@ -58,9 +58,13 @@ func handleRequest(conn net.Conn, db *sql.DB) {
 
 	for {
 		n, err := conn.Read(buf)
-		fmt.Println("receive :", buf[0:n])
+		//fmt.Printf("receive :%#v\n\n", buf[0:n])
 
-		ParseRequest(buf[0:n], conn, db)
+		errParse := ParseRequest(buf[0:n], conn, db)
+
+		if errParse != nil {
+			log.Print(errParse)
+		}
 
 		if err != nil || n == 0 {
 			conn.Close()

@@ -1,6 +1,6 @@
 package message
 
-import "github.com/Nyarum/barrel"
+import "github.com/Morphux/mps/vendors/Nyarum/barrel"
 
 //Message is the basic structure to send and receive Message all the methods can be overwritted if needed
 type Message struct {

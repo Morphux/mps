@@ -27,6 +27,7 @@ type Package struct {
 	ArchiveSize   float64
 	InstalledSize float64
 	ArchiveHash   string
+	TimeAddPkg    uint64
 }
 
 func RequestPackage(data []byte, db *sql.DB) (int, Package, error) {
@@ -40,7 +41,7 @@ func RequestPackage(data []byte, db *sql.DB) (int, Package, error) {
 		return n, pkg, err
 	}
 
-	fmt.Println(req)
+	fmt.Println("unpacked :", req)
 
 	if req.ID != 0 && req.NameLen == 0 && req.CategLen == 0 {
 		fmt.Println("search By id")
@@ -70,9 +71,9 @@ func PkgtoRespPkg(pkg Package) (*response.RespPkg, error) {
 
 	ret := new(response.RespPkg)
 	ret.ID = pkg.ID
-	ret.CompTime = pkg.SBU
-	ret.InstSize = pkg.InstalledSize
-	ret.ArchSize = pkg.ArchiveSize
+	ret.CompTime = float64(pkg.SBU)
+	ret.InstSize = float64(pkg.InstalledSize)
+	ret.ArchSize = float64(pkg.ArchiveSize)
 	ret.State = pkg.State
 	ret.NameLen = uint64(len(pkg.Name))
 	ret.CategoryLen = uint16(len(pkg.Category))
@@ -110,7 +111,7 @@ func QueryPkgNameAndCat(name string, category string, state uint8, db *sql.DB) (
 	}
 	for rows.Next() {
 		err := rows.Scan(&pkg.ID, &pkg.Name, &pkg.State, &pkg.Version, &pkg.Category, &pkg.Description,
-			&pkg.Archive, &pkg.SBU, &pkg.Dependencies, &pkg.ArchiveSize, &pkg.InstalledSize, &pkg.ArchiveHash)
+			&pkg.Dependencies, &pkg.Archive, &pkg.SBU, &pkg.ArchiveSize, &pkg.InstalledSize, &pkg.ArchiveHash, &pkg.TimeAddPkg)
 		if err != nil {
 			return pkg, err
 			log.Fatalln(err)
@@ -129,7 +130,7 @@ func QueryPkgID(id uint64, state uint8, db *sql.DB) (Package, error) {
 	}
 	for rows.Next() {
 		err := rows.Scan(&pkg.ID, &pkg.Name, &pkg.State, &pkg.Version, &pkg.Category, &pkg.Description,
-			&pkg.Archive, &pkg.SBU, &pkg.Dependencies, &pkg.ArchiveSize, &pkg.InstalledSize, &pkg.ArchiveHash)
+			&pkg.Dependencies, &pkg.Archive, &pkg.SBU, &pkg.ArchiveSize, &pkg.InstalledSize, &pkg.ArchiveHash, &pkg.TimeAddPkg)
 		if err != nil {
 			return pkg, err
 			log.Fatalln(err)

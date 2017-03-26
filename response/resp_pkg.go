@@ -1,8 +1,10 @@
 package response
 
 import (
+	"fmt"
+
 	"github.com/Morphux/mps/message"
-	"github.com/Nyarum/barrel"
+	"github.com/Morphux/mps/vendors/Nyarum/barrel"
 )
 
 type RespPkg struct {
@@ -28,6 +30,9 @@ type RespPkg struct {
 }
 
 func (p *RespPkg) Pack() ([]byte, error) {
+
+	fmt.Printf("%#v\n", p)
+
 	barrel := barrel.NewBarrel()
 	load := barrel.Load(p, []byte{}, true)
 

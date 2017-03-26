@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	"log"
 	"net"
 
 	"github.com/Morphux/mps/message"
@@ -28,23 +27,34 @@ func ParseRequest(data []byte, conn net.Conn, db *sql.DB) error {
 		return errors.New("Header too short")
 	}
 
-	//dismiss payload for now
-
-	cursor = cursor + 1
+	//payload
+	cursor += 1
 
 	switch header.Type {
 	case 0x01:
 		conn.Write(response.GetAuthACK())
 	case 0x10:
+
 		c, pkg, err := RequestPackage(data[cursor+1:], db)
 
+		if err != nil {
+			conn.Write(message.MalformedPacket())
+			return err
+		}
+
 		resp, err := PkgtoRespPkg(pkg)
+
+		if err != nil {
+			return err
+		}
 
 		resp_data, err := resp.Pack()
 
 		if err != nil {
-			log.Fatal(err)
+			return err
 		}
+
+		fmt.Println(resp_data)
 
 		resp_header := new(message.Header)
 
@@ -52,9 +62,18 @@ func ParseRequest(data []byte, conn net.Conn, db *sql.DB) error {
 
 		header_data, err := resp_header.Pack()
 
-		conn.Write(append(header_data, resp_data...))
+		tosend := append(header_data, resp_data...)
 
-		//conn.Write()
+		fmt.Printf("PKG DATA TO BE SENT : %#v\n", tosend)
+
+		i, err := conn.Write(tosend)
+
+		fmt.Println(i)
+
+		if err != nil {
+			return err
+		}
+
 		cursor += c
 	default:
 		fmt.Println(header.Type)
