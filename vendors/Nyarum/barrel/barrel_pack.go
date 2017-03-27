@@ -29,6 +29,8 @@ func (b *Barrel) Pack(value reflect.Value) error {
 		}
 	case reflect.Float64:
 		b.processor.WriteFloat64(float64(value.Float()))
+	case reflect.Float32:
+		b.processor.WriteFloat32(float32(value.Float()))
 	case reflect.Uint8:
 		b.processor.WriteUint8(uint8(value.Uint()))
 	case reflect.Int8:

@@ -48,8 +48,9 @@ func (p *Header) Pack() ([]byte, error) {
 func BuildHeader(Type, number uint8, data []byte) []byte {
 
 	hash := ""
+	length := len(data) + 4 + 1;
 
-	header := []byte{Type, byte(len(data) & 0xff), byte(len(data) >> 8), byte(len(hash))}
+	header := []byte{Type, byte(length & 0xff), byte(length >> 8), byte(len(hash))}
 
 	return header
 

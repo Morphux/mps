@@ -71,21 +71,21 @@ func PkgtoRespPkg(pkg Package) (*response.RespPkg, error) {
 
 	ret := new(response.RespPkg)
 	ret.ID = pkg.ID
-	ret.CompTime = float64(pkg.SBU)
-	ret.InstSize = float64(pkg.InstalledSize)
-	ret.ArchSize = float64(pkg.ArchiveSize)
+	ret.CompTime = float32(15)
+	ret.InstSize = float32(14)
+	ret.ArchSize = float32(16)
 	ret.State = pkg.State
-	ret.NameLen = uint64(len(pkg.Name))
+	ret.NameLen = uint16(len(pkg.Name))
 	ret.CategoryLen = uint16(len(pkg.Category))
 	ret.VersionLen = uint16(len(pkg.Version))
 	ret.ArchiveLen = uint16(len(pkg.Archive))
 	ret.ChecksumLen = uint16(len(pkg.ArchiveHash))
 	ret.DependenciesSize = uint16(len(depID))
-	ret.Name = pkg.Name
-	ret.Category = pkg.Category
-	ret.Version = pkg.Version
-	ret.Archive = pkg.Archive
-	ret.Checksum = pkg.ArchiveHash
+	ret.Name = []byte(pkg.Name)
+	ret.Category = []byte(pkg.Category)
+	ret.Version = []byte(pkg.Version)
+	ret.Archive = []byte(pkg.Archive)
+	ret.Checksum = []byte(pkg.ArchiveHash)
 	ret.Dependencies = depID
 
 	return ret, nil
