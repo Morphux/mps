@@ -71,9 +71,9 @@ func PkgtoRespPkg(pkg Package) (*response.RespPkg, error) {
 
 	ret := new(response.RespPkg)
 	ret.ID = pkg.ID
-	ret.CompTime = float32(15)
-	ret.InstSize = float32(14)
-	ret.ArchSize = float32(16)
+	ret.CompTime = float32(pkg.SBU)
+	ret.InstSize = float32(pkg.InstalledSize)
+	ret.ArchSize = float32(pkg.ArchiveSize)
 	ret.State = pkg.State
 	ret.NameLen = uint16(len(pkg.Name))
 	ret.CategoryLen = uint16(len(pkg.Category))
