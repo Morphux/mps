@@ -20,6 +20,11 @@
 <a href="#install">Install</a> • <a href="#test">Test</a> • <a href="#use">Use</a> • <a href="#documentation">Documentation</a>
 </p>
 
+# Clone
+```
+git clone https://github.com/Morphux/mps --recursive
+```
+
 # Install
 
 You need to have a correct [GOPATH](https://golang.org/doc/code.html#GOPATH)
@@ -31,8 +36,9 @@ go get -u github.com/Morphux/mps
 
 # Test
 
-
-### Not written yet
+```
+make test
+```
 
 # Use
 
