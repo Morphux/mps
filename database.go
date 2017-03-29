@@ -129,8 +129,8 @@ func QueryPkgNameAndCat(name string, category string, state uint8, db *sql.DB) (
 		err := rows.Scan(&pkg.ID, &pkg.Name, &pkg.State, &pkg.Version, &pkg.Category, &pkg.Description,
 			&pkg.Dependencies, &pkg.Archive, &pkg.SBU, &pkg.ArchiveSize, &pkg.InstalledSize, &pkg.ArchiveHash, &pkg.TimeAddPkg)
 		if err != nil {
-			return pkg, err
 			log.Fatalln(err)
+			return pkg, err
 		}
 		return pkg, nil
 	}
@@ -148,8 +148,8 @@ func QueryPkgID(id uint64, state uint8, db *sql.DB) (Package, error) {
 		err := rows.Scan(&pkg.ID, &pkg.Name, &pkg.State, &pkg.Version, &pkg.Category, &pkg.Description,
 			&pkg.Dependencies, &pkg.Archive, &pkg.SBU, &pkg.ArchiveSize, &pkg.InstalledSize, &pkg.ArchiveHash, &pkg.TimeAddPkg)
 		if err != nil {
-			return pkg, err
 			log.Fatalln(err)
+			return pkg, err
 		}
 		return pkg, nil
 	}
