@@ -44,5 +44,9 @@ check:
 	@for d in $$(go list ./... | grep -v /vendors/); do golint $${d}; done
 	@go tool vet ${SRC}
 
+test: $(TARGET)
+	make -C tests init all
+	./launch_test.sh
+
 run: install
 	@$(TARGET)
