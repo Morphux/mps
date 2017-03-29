@@ -4,7 +4,7 @@
 <p align="center">
 <img src="https://img.shields.io/badge/language-go-blue.svg" /> &nbsp;
 <img src="https://img.shields.io/badge/license-Apache--2.0-yellow.svg" /> &nbsp;
-<!--<a href="https://travis-ci.org/Morphux/libmpm"><img src="https://travis-ci.org/Morphux/libmpm.svg?branch=master"/></a> &nbsp;-->
+<a href="https://travis-ci.org/Morphux/mps"><img src="https://travis-ci.org/Morphux/mps.svg?branch=master"/></a> &nbsp;
 <!--<a href="https://scan.coverity.com/projects/morphux-libmpm">
   <img alt="Coverity Scan Build Status"
        src="https://scan.coverity.com/projects/11577/badge.svg"/>
@@ -31,7 +31,6 @@ You need to have a correct [GOPATH](https://golang.org/doc/code.html#GOPATH)
 
 ```
 go get -u github.com/Morphux/mps
-
 ```
 
 # Test
