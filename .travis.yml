@@ -1,0 +1,12 @@
+language: go
+dist: trusty
+
+before_install:
+    - sudo apt-get -qq update
+    - sudo apt-get install -y autopoint flex gettext
+
+install:
+    - go get github.com/mattn/go-sqlite3
+
+script:
+    - make build test
