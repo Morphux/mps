@@ -41,7 +41,7 @@ make test
 
 # Use
 
-Run as follow
+Run as follow :
 
 
 ```
