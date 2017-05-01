@@ -17,6 +17,8 @@
 package main
 
 import (
+	"crypto/rand"
+	"crypto/tls"
 	"database/sql"
 	"flag"
 	"fmt"
@@ -34,6 +36,10 @@ func main() {
 
 	databasePtr := flag.String("db", "", "a sqlite database")
 
+	tlsPtr := flag.Bool("tls", false, "use or not tls")
+	PublicKeyPtr := flag.String("pub", "", "public key path")
+	PrivateKeyPtr := flag.String("priv", "", "private key path")
+
 	flag.Parse()
 
 	if *databasePtr == "" || len(flag.Args()) == 0 {
@@ -47,17 +53,42 @@ func main() {
 	}
 	defer db.Close()
 
-	l, err := net.Listen("tcp", flag.Args()[0])
+	var listener net.Listener
+
+	if *tlsPtr == true && *PrivateKeyPtr != "" && *PublicKeyPtr != "" {
+		cert, err := tls.LoadX509KeyPair(*PrivateKeyPtr, *PublicKeyPtr)
+		if err != nil {
+			log.Fatalf("server: loadkeys: %s", err)
+		}
+		config := tls.Config{Certificates: []tls.Certificate{cert}}
+		config.Rand = rand.Reader
+
+		fmt.Println("Successfully load key pair ", *PrivateKeyPtr, *PublicKeyPtr)
+
+		listener, err = tls.Listen("tcp", flag.Args()[0], &config)
+	} else {
+		listener, err = net.Listen("tcp", flag.Args()[0])
+	}
+
+	if listener == nil {
+		fmt.Println("Error listening")
+		os.Exit(1)
+	}
+
 	if err != nil {
 		fmt.Println("Error listening:", err.Error())
 		os.Exit(1)
 	}
 
-	defer l.Close()
-	fmt.Println("Listening on " + flag.Args()[0])
-	for {
+	defer listener.Close()
+	if *tlsPtr {
+		fmt.Println("Listening on "+flag.Args()[0], "with TLS support")
+	} else {
+		fmt.Println("Listening on " + flag.Args()[0])
+	}
 
-		conn, err := l.Accept()
+	for {
+		conn, err := listener.Accept()
 		if err != nil {
 			fmt.Println("Error accepting: ", err.Error())
 			os.Exit(1)
