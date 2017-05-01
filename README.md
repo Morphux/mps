@@ -54,6 +54,14 @@ options:
 ```C
 mps usage : mps host:port
     -db <database file> : import sqlite3 db
+    
+    -priv string: private key path
+    
+    -pub string: public key path
+    
+    -tls: use or not tls
 ```
+
+note: to activate TLS support you have to specify a private and a public key
 
 # Documentation
