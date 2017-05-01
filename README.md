@@ -41,16 +41,14 @@ make test
 
 # Use
 
-Run as follow :
+### Run as follow :
 
 
 ```
 mps -db data.db 127.0.0.1:9090
 ```
 
-
-
-options:
+### options:
 ```C
 mps usage : mps host:port
     -db <database file> : import sqlite3 db
