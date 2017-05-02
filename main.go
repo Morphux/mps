@@ -56,7 +56,7 @@ func main() {
 	var listener net.Listener
 
 	if *tlsPtr == false && *PrivateKeyPtr != "" && *PublicKeyPtr != "" {
-		cert, err := tls.LoadX509KeyPair(*PrivateKeyPtr, *PublicKeyPtr)
+		cert, err := tls.LoadX509KeyPair(*PublicKeyPtr, *PrivateKeyPtr)
 		if err != nil {
 			log.Fatalf("server: loadkeys: %s", err)
 		}
