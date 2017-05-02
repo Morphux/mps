@@ -29,8 +29,8 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
-const MPM_MAJOR_VERSION uint8 = 0
-const MPM_MINOR_VERSION uint8 = 1
+// const MajorVersion uint8 = 0
+// const MinorVersion uint8 = 1
 
 func main() {
 
@@ -71,7 +71,7 @@ func main() {
 	}
 
 	if listener == nil {
-		fmt.Println("Error listening")
+		fmt.Println("Error listening: listener == nil (Maybe unbindable address)")
 		os.Exit(1)
 	}
 

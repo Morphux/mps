@@ -26,6 +26,7 @@ import (
 	"github.com/Morphux/mps/response"
 )
 
+//ParseRequest generate the correct interaction with the receive packet, return an error if any step fail
 func ParseRequest(data []byte, conn net.Conn, db *sql.DB) error {
 	var cursor int
 	var header = new(message.Header)
@@ -44,7 +45,7 @@ func ParseRequest(data []byte, conn net.Conn, db *sql.DB) error {
 	}
 
 	//payload
-	cursor += 1
+	cursor++
 
 	switch header.Type {
 	case 0x01:
@@ -64,24 +65,24 @@ func ParseRequest(data []byte, conn net.Conn, db *sql.DB) error {
 			return err
 		}
 
-		resp_data, err := resp.Pack()
+		respData, err := resp.Pack()
 
 		if err != nil {
 			return err
 		}
 
-		fmt.Println(resp_data)
+		fmt.Println(respData)
 
-		resp_header := new(message.Header)
+		respHeader := new(message.Header)
 
-		resp_header.Build(0x20, 1, resp_data)
+		respHeader.Build(0x20, 1, respData)
 
-		header_data, err := resp_header.Pack()
+		headerData, err := respHeader.Pack()
 
-		fmt.Println("header", header_data, resp_header, message.BuildHeader(0x20, 1, resp_data))
+		fmt.Println("header", headerData, respHeader, message.BuildHeader(0x20, 1, respData))
 
-		tosend := append(message.BuildHeader(0x20, 1, resp_data), 0x1)
-		tosend = append(tosend, resp_data...)
+		tosend := append(message.BuildHeader(0x20, 1, respData), 0x1)
+		tosend = append(tosend, respData...)
 
 		_, err = conn.Write(tosend)
 

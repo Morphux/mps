@@ -29,7 +29,7 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
-// MPM package
+//Package is a MPS internally used interface to make a bridge between the sql query and the resp_pkg
 type Package struct {
 	ID            uint64
 	Name          string
@@ -46,6 +46,7 @@ type Package struct {
 	TimeAddPkg    uint64
 }
 
+//RequestPackage return a `Package` struct corresponding to the packet passed as data
 func RequestPackage(data []byte, db *sql.DB) (int, Package, error) {
 	pkg := Package{}
 
@@ -72,6 +73,7 @@ func RequestPackage(data []byte, db *sql.DB) (int, Package, error) {
 	return n, pkg, err
 }
 
+//PkgtoRespPkg convert a `Package` to the correct reps_pkg packet
 func PkgtoRespPkg(pkg Package) (*response.RespPkg, error) {
 
 	dep := strings.Split(pkg.Dependencies, ",")
@@ -107,6 +109,7 @@ func PkgtoRespPkg(pkg Package) (*response.RespPkg, error) {
 	return ret, nil
 }
 
+//QueryPkgNameAndCat Query the database to get a package by its name or categories
 func QueryPkgNameAndCat(name string, category string, state uint8, db *sql.DB) (Package, error) {
 	pkg := Package{}
 
@@ -138,6 +141,7 @@ func QueryPkgNameAndCat(name string, category string, state uint8, db *sql.DB) (
 	return pkg, nil
 }
 
+//QueryPkgID Query the database to get a package by its id
 func QueryPkgID(id uint64, state uint8, db *sql.DB) (Package, error) {
 	pkg := Package{}
 	rows, err := db.Query("SELECT * FROM pkgs where id = ?", id)
