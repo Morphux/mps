@@ -57,9 +57,7 @@ mps usage : mps host:port
     
     -pub string: public key path
     
-    -tls: use or not tls
+    -notls: Do not use tls
 ```
-
-note: to activate TLS support you have to specify a private and a public key
 
 # Documentation

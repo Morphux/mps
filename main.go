@@ -34,11 +34,11 @@ import (
 
 func main() {
 
-	databasePtr := flag.String("db", "", "a sqlite database")
+	databasePtr := flag.String("db", "", "A sqlite database")
 
-	tlsPtr := flag.Bool("tls", false, "use or not tls")
-	PublicKeyPtr := flag.String("pub", "", "public key path")
-	PrivateKeyPtr := flag.String("priv", "", "private key path")
+	tlsPtr := flag.Bool("notls", false, "Do not use tls")
+	PublicKeyPtr := flag.String("pub", "", "Public key path")
+	PrivateKeyPtr := flag.String("priv", "", "Private key path")
 
 	flag.Parse()
 
@@ -55,7 +55,7 @@ func main() {
 
 	var listener net.Listener
 
-	if *tlsPtr == true && *PrivateKeyPtr != "" && *PublicKeyPtr != "" {
+	if *tlsPtr == false && *PrivateKeyPtr != "" && *PublicKeyPtr != "" {
 		cert, err := tls.LoadX509KeyPair(*PrivateKeyPtr, *PublicKeyPtr)
 		if err != nil {
 			log.Fatalf("server: loadkeys: %s", err)
@@ -67,7 +67,12 @@ func main() {
 
 		listener, err = tls.Listen("tcp", flag.Args()[0], &config)
 	} else {
-		listener, err = net.Listen("tcp", flag.Args()[0])
+		if (*tlsPtr == true) {
+			listener, err = net.Listen("tcp", flag.Args()[0])
+		} else {
+			fmt.Println("Cannot launch server without tls support")
+			os.Exit(1)
+		}
 	}
 
 	if listener == nil {
@@ -81,7 +86,7 @@ func main() {
 	}
 
 	defer listener.Close()
-	if *tlsPtr {
+	if *tlsPtr == false {
 		fmt.Println("Listening on "+flag.Args()[0], "with TLS support")
 	} else {
 		fmt.Println("Listening on " + flag.Args()[0])
