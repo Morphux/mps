@@ -107,6 +107,13 @@ func PkgtoRespPkg(pkg Package) (*response.RespPkg, error) {
 	return ret, nil
 }
 
+func checkAND(query string) string {
+	if query[len(query)-1] == '?' {
+		return " AND"
+	}
+	return ""
+}
+
 func buildQuery(req Package, after uint64) (string, []interface{}, error) {
 	var fields []interface{}
 
@@ -117,51 +124,51 @@ func buildQuery(req Package, after uint64) (string, []interface{}, error) {
 		fields = append(fields, req.ID)
 	}
 	if req.Name != "" {
-		query += " name = ?"
+		query += checkAND(query) + " name = ?"
 		fields = append(fields, req.Name)
 	}
 	if req.State != 0 {
-		query += " state = ?"
+		query += checkAND(query) + " state = ?"
 		fields = append(fields, req.State)
 	}
 	if req.Version != "" {
-		query += " version = ?"
+		query += checkAND(query) + " version = ?"
 		fields = append(fields, req.Version)
 	}
 	if req.Category != "" {
-		query += " category = ?"
+		query += checkAND(query) + " category = ?"
 		fields = append(fields, req.Category)
 	}
 	if req.Description != "" {
-		query += " description = ?"
+		query += checkAND(query) + " description = ?"
 		fields = append(fields, req.Description)
 	}
 	if req.Archive != "" {
-		query += " archive = ?"
+		query += checkAND(query) + " archive = ?"
 		fields = append(fields, req.Archive)
 	}
 	if req.SBU != 0 {
-		query += " SBU = ?"
+		query += checkAND(query) + " SBU = ?"
 		fields = append(fields, req.SBU)
 	}
 	if req.Dependencies != "" {
-		query += " dependencies = ?"
+		query += checkAND(query) + " dependencies = ?"
 		fields = append(fields, req.Dependencies)
 	}
 	if req.ArchiveSize != 0 {
-		query += " archiveSize = ?"
+		query += checkAND(query) + " archiveSize = ?"
 		fields = append(fields, req.ArchiveSize)
 	}
 	if req.InstalledSize != 0 {
-		query += " archiveSize = ?"
+		query += checkAND(query) + " archiveSize = ?"
 		fields = append(fields, req.InstalledSize)
 	}
 	if req.ArchiveHash != "" {
-		query += " archiveHash = ?"
+		query += checkAND(query) + " archiveHash = ?"
 		fields = append(fields, req.ArchiveHash)
 	}
 	if req.TimeAddPkg != 0 {
-		query += " timeAddPkg = ?"
+		query += checkAND(query) + " timeAddPkg = ?"
 		fields = append(fields, req.TimeAddPkg)
 	}
 
