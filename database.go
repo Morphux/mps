@@ -61,10 +61,8 @@ func RequestPackage(data []byte, db *sql.DB) (int, Package, error) {
 	fmt.Println("unpacked :", req)
 
 	if req.ID != 0 && req.NameLen == 0 && req.CategLen == 0 {
-		fmt.Println("search By id")
 		pkg, err = QueryPkgID(req.ID, req.State, db)
 	} else if req.ID == 0 && req.NameLen != 0 && req.CategLen != 0 {
-		fmt.Println("search By category")
 		pkg, err = QueryPkgNameAndCat(req.Name, req.Category, req.State, db)
 	} else {
 		err = errors.New("A packet send by the client is wrong")
@@ -107,6 +105,126 @@ func PkgtoRespPkg(pkg Package) (*response.RespPkg, error) {
 	ret.Dependencies = depID
 
 	return ret, nil
+}
+
+func buildQuery(req Package, after uint64) (string, []interface{}, error) {
+	var fields []interface{}
+
+	query := fmt.Sprintf("SELECT * WHERE timeAddPkg >= %d", after)
+
+	if req.ID != 0 {
+		query += "id = ?"
+		fields = append(fields, req.ID)
+	}
+	if req.Name != "" {
+		query += " name = ?"
+		fields = append(fields, req.Name)
+	}
+	if req.State != 0 {
+		query += " state = ?"
+		fields = append(fields, req.State)
+	}
+	if req.Version != "" {
+		query += " version = ?"
+		fields = append(fields, req.Version)
+	}
+	if req.Category != "" {
+		query += " category = ?"
+		fields = append(fields, req.Category)
+	}
+	if req.Description != "" {
+		query += " description = ?"
+		fields = append(fields, req.Description)
+	}
+	if req.Archive != "" {
+		query += " archive = ?"
+		fields = append(fields, req.Archive)
+	}
+	if req.SBU != 0 {
+		query += " SBU = ?"
+		fields = append(fields, req.SBU)
+	}
+	if req.Dependencies != "" {
+		query += " dependencies = ?"
+		fields = append(fields, req.Dependencies)
+	}
+	if req.ArchiveSize != 0 {
+		query += " archiveSize = ?"
+		fields = append(fields, req.ArchiveSize)
+	}
+	if req.InstalledSize != 0 {
+		query += " archiveSize = ?"
+		fields = append(fields, req.InstalledSize)
+	}
+	if req.ArchiveHash != "" {
+		query += " archiveHash = ?"
+		fields = append(fields, req.ArchiveHash)
+	}
+	if req.TimeAddPkg != 0 {
+		query += " timeAddPkg = ?"
+		fields = append(fields, req.TimeAddPkg)
+	}
+
+	if query == fmt.Sprintf("SELECT * WHERE timeAddPkg >= %d", after) {
+		return "", fields, errors.New("empty request")
+	}
+
+	return query, fields, nil
+}
+
+// QueryPkg Specify a pkg struct as argument and query by it's non empty field,  after are specified in case of update, return only the first occurence
+func QueryPkg(req Package, after uint64, db *sql.DB) (Package, error) {
+	pkg := Package{}
+
+	var err error
+	var rows *sql.Rows
+
+	query, fields, err := buildQuery(req, after)
+
+	rows, err = db.Query(query, fields...)
+
+	if err != nil {
+		log.Fatalln(err)
+	}
+	for rows.Next() {
+		err := rows.Scan(&pkg.ID, &pkg.Name, &pkg.State, &pkg.Version, &pkg.Category, &pkg.Description,
+			&pkg.Dependencies, &pkg.Archive, &pkg.SBU, &pkg.ArchiveSize, &pkg.InstalledSize, &pkg.ArchiveHash, &pkg.TimeAddPkg)
+		if err != nil {
+			log.Fatalln(err)
+			return pkg, err
+		}
+		return pkg, nil
+	}
+
+	return pkg, nil
+}
+
+// QueryPkgs Specify a pkg struct as argument and query by it's non empty field,  after are specified in case of update, return all occurences
+func QueryPkgs(req Package, after uint64, db *sql.DB) ([]Package, error) {
+	pkgs := []Package{}
+
+	var err error
+	var rows *sql.Rows
+
+	query, fields, err := buildQuery(req, after)
+
+	rows, err = db.Query(query, fields...)
+
+	if err != nil {
+		log.Fatalln(err)
+	}
+	for rows.Next() {
+		pkg := Package{}
+		err := rows.Scan(&pkg.ID, &pkg.Name, &pkg.State, &pkg.Version, &pkg.Category, &pkg.Description,
+			&pkg.Dependencies, &pkg.Archive, &pkg.SBU, &pkg.ArchiveSize, &pkg.InstalledSize, &pkg.ArchiveHash, &pkg.TimeAddPkg)
+		if err != nil {
+			log.Fatalln(err)
+			return nil, err
+		}
+		pkgs = append(pkgs, pkg)
+	}
+
+	return pkgs, nil
 }
 
 //QueryPkgNameAndCat Query the database to get a package by its name or categories
